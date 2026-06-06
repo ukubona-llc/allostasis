@@ -1,0 +1,462 @@
+
+<style>
+  :root {
+    --cream: #f9f7f2;
+    --white: #ffffff;
+    --charcoal: #1a1a1a;
+    --slate: #5a6472;
+    --mist: #9ba3af;
+    --green-deep: #1a4a2e;
+    --green-mid: #2d6a45;
+    --green-bright: #3d8b5e;
+    --green-light: #e8f4ed;
+    --green-pale: #f2faf5;
+    --gold: #b8860b;
+    --gold-light: #f5e6a3;
+    --border: #e2e8f0;
+    --radius: 4px;
+    --radius-lg: 8px;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); color: var(--color-text-primary); font-size: 15px; line-height: 1.7; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.72rem; color: var(--green-bright); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.4rem; }
+  h1 { font-family: var(--font-display); font-size: 2.1rem; font-weight: 300; color: var(--green-deep); line-height: 1.2; margin-bottom: 0.5rem; }
+  .subtitle { font-family: var(--font-mono); font-size: 0.8rem; color: var(--gold); margin-bottom: 1.8rem; letter-spacing: 0.04em; }
+  .prose { line-height: 1.75; margin-bottom: 1.2rem; color: var(--color-text-primary); }
+  h2 { font-family: var(--font-display); font-size: 1.45rem; font-weight: 400; color: var(--green-deep); margin-bottom: 0.75rem; margin-top: 2rem; }
+  .mono-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.08em; }
+  .card { background: var(--color-background-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+  .dark-card { background: var(--green-deep); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+  .dark-card .mono-label { color: var(--gold-light); margin-bottom: 0.6rem; }
+  .dark-card p { font-family: var(--font-mono); font-size: 0.88rem; color: #c8e6d4; line-height: 1.9; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 2rem; }
+  .compare-card { padding: 1rem 1.1rem; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--color-background-primary); }
+  .compare-card .label { font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 500; }
+  .compare-card p { font-size: 0.83rem; line-height: 1.6; color: var(--color-text-secondary); }
+  .card-homeostasis .label { color: var(--green-mid); }
+  .card-allostasis .label { color: var(--gold); }
+  .card-homeostasis { border-top: 3px solid var(--green-mid); }
+  .card-allostasis { border-top: 3px solid var(--gold); }
+
+  .phase-row { display: flex; gap: 1rem; align-items: flex-start; padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+  .phase-row:hover { background: var(--green-pale); }
+  .phase-row:last-child { border-bottom: none; }
+  .phase-num { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; min-width: 3.5rem; padding-top: 0.1rem; }
+  .phase-body { flex: 1; }
+  .phase-name { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.15rem; }
+  .phase-sub { font-size: 0.78rem; color: var(--color-text-secondary); }
+  .phase-detail { padding: 0.75rem 1.1rem 1rem; border-top: 1px solid var(--border); background: var(--green-pale); display: none; font-size: 0.85rem; line-height: 1.7; color: var(--color-text-secondary); }
+  .phase-detail.open { display: block; }
+  .chevron { color: var(--mist); font-size: 0.75rem; padding-top: 0.2rem; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .slider-section { margin-bottom: 2rem; }
+  .slider-row { margin-bottom: 1rem; }
+  .slider-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.3rem; }
+  .slider-name { font-size: 0.82rem; color: var(--color-text-secondary); }
+  .slider-val { font-family: var(--font-mono); font-size: 0.78rem; color: var(--green-bright); font-weight: 500; }
+  input[type=range] { width: 100%; }
+  .viz-bar { height: 10px; border-radius: 5px; transition: width 0.3s; }
+
+  .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 2rem; }
+  .output-card { background: var(--color-background-secondary); border-radius: var(--radius); padding: 1rem; }
+  .output-label { font-size: 0.72rem; font-family: var(--font-mono); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+  .output-val { font-size: 1.4rem; font-weight: 500; color: var(--color-text-primary); }
+  .output-sub { font-size: 0.7rem; color: var(--color-text-secondary); margin-top: 0.2rem; }
+
+  .iwgeu-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
+  .iwgeu-table th { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-secondary); padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); font-weight: 400; }
+  .iwgeu-table td { padding: 0.8rem 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.83rem; vertical-align: top; line-height: 1.55; }
+  .iwgeu-table tr:last-child td { border-bottom: none; }
+  .iwgeu-table tr:hover td { background: var(--green-pale); }
+  .td-layer { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; white-space: nowrap; }
+  .td-sym { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); }
+  .td-allostatic { color: var(--color-text-secondary); }
+
+  .q-block { background: var(--color-background-primary); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1rem; overflow: hidden; }
+  .q-head { padding: 1rem 1.1rem 0.75rem; }
+  .q-num { font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+  .q-text { font-family: var(--font-display); font-size: 1rem; font-weight: 400; color: var(--green-deep); margin: 0.3rem 0 0.75rem; line-height: 1.5; }
+  .opt { padding: 0.55rem 0.85rem; border-radius: var(--radius); font-size: 0.84rem; cursor: pointer; border: 1px solid var(--border); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; transition: background 0.15s; background: var(--color-background-secondary); line-height: 1.5; }
+  .opt:hover { background: var(--green-pale); border-color: var(--green-bright); }
+  .opt.correct { background: var(--green-light); border-color: var(--green-mid); color: var(--green-deep); }
+  .opt.wrong { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+  .opt-ltr { font-family: var(--font-mono); font-size: 0.7rem; min-width: 1rem; color: var(--mist); }
+  .explain { border-top: 1px solid var(--border); padding: 0.75rem 1.1rem; font-family: var(--font-mono); font-size: 0.74rem; line-height: 1.65; }
+  .explain.correct { background: var(--green-light); color: var(--green-deep); }
+  .explain.wrong { background: #fef2f2; color: #7f1d1d; }
+
+  .score-box { padding: 1rem 1.25rem; border-radius: var(--radius-lg); text-align: center; margin-bottom: 1.5rem; display: none; }
+  .score-box.show { display: block; }
+  .score-box.pass { background: var(--green-light); border: 1px solid var(--green-mid); }
+  .score-box.fail { background: #fef3c7; border: 1px solid #fcd34d; }
+  .score-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; margin-bottom: 0.3rem; }
+  .score-sub { font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-text-secondary); }
+
+  .complete-btn { display: block; width: 100%; padding: 0.9rem; background: var(--green-deep); color: #fff; border: none; border-radius: var(--radius-lg); font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; cursor: pointer; margin-bottom: 2rem; letter-spacing: 0.02em; display: none; }
+  .complete-btn.show { display: block; }
+  .completion-banner { background: var(--green-deep); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; margin-bottom: 2rem; display: none; }
+  .completion-banner.show { display: block; }
+  .completion-banner .check { font-size: 2rem; margin-bottom: 0.5rem; }
+  .completion-banner h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; color: #fff; margin-bottom: 0.3rem; }
+  .completion-banner p { font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold-light); }
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">A501: Allostasis — Beyond Balance, Toward Prediction. An interactive lesson on allostatic versus homeostatic regulation in adaptive systems.</h2>
+
+  <p class="eyebrow">Adaptation · Research · A501</p>
+  <h1>Allostasis — Beyond Balance, Toward Prediction</h1>
+  <p class="subtitle">homeostasis reacts · allostasis anticipates · the organism models what comes next</p>
+
+  <p class="prose">Homeostasis is the story we tell about the body: a thermostat, a balance point, a set value maintained against disturbance. It is a useful story. It is also incomplete.</p>
+  <p class="prose">Allostasis is the correction. The organism does not merely react to perturbation — it predicts it. Heart rate rises before the runner moves. Cortisol peaks before the alarm sounds. The system achieves stability not by holding a fixed point but by continuously modeling what demand is coming and adjusting its parameters in advance.</p>
+  <p class="prose">In Ukubona terms: homeostasis is Layer III reacting to ε after it arrives. Allostasis is Layer III modeling f(σ², λ, ε) before ε is observed. The distinction changes everything about how you design adaptive systems — biological or institutional.</p>
+
+  <h2>Homeostasis vs Allostasis</h2>
+  <div class="compare-grid">
+    <div class="compare-card card-homeostasis">
+      <div class="label">Homeostasis</div>
+      <p>Deviation detected → corrective response → return to set point. The thermostat model. Reactive. Error-driven. Works when demands are predictable and the set point is fixed.</p>
+    </div>
+    <div class="compare-card card-allostasis">
+      <div class="label">Allostasis</div>
+      <p>Demand predicted → parameters adjusted in advance → stability achieved through anticipation. The organism as model. Proactive. Prediction-driven. Required when demands are variable and context-dependent.</p>
+    </div>
+  </div>
+
+  <div class="dark-card">
+    <div class="mono-label">The allostatic equation</div>
+    <p>
+      Homeostatic load = Σ(perturbations reacted to)<br>
+      Allostatic load   = Σ(predictions × cost of prediction error)<br>
+      ──────────────────────────────────────<br>
+      Chronic disease   = allostatic load exceeds adaptive capacity<br>
+      f(σ², λ, ε)      = the throughput that determines which load survives
+    </p>
+  </div>
+
+  <h2>The Five Phases of Allostatic Regulation</h2>
+  <p class="prose" style="margin-bottom:1rem">Each phase maps onto the TMVES pentad. Tap a phase to read its allostatic interpretation.</p>
+
+  <div class="card" style="margin-bottom:2rem" id="phases">
+    <div class="phase-row" onclick="togglePhase(0)">
+      <div class="phase-num" style="color:var(--green-mid)">I · World</div>
+      <div class="phase-body"><div class="phase-name">Signal detection</div><div class="phase-sub">θᵗ — the body's current state + incoming context</div></div>
+      <div class="chevron" id="chev-0">▾</div>
+    </div>
+    <div class="phase-detail" id="det-0">The allostatic system is always reading the environment for prediction targets — not just current error but anticipated demand. In institutional terms: the NPA doesn't just measure last year's CKD burden; it reads rainfall, food security, and population movement to predict next year's. The tensor includes the predictive context, not only the present measurement.</div>
+
+    <div class="phase-row" onclick="togglePhase(1)">
+      <div class="phase-num" style="color:var(--gold)">II · Perception</div>
+      <div class="phase-body"><div class="phase-name">Predictive weighting</div><div class="phase-sub">b + Σwᵢ·Xᵢ — prior experience shapes the prior</div></div>
+      <div class="chevron" id="chev-1">▾</div>
+    </div>
+    <div class="phase-detail" id="det-1">The institutional prior b is not neutral — it encodes the history of every previous allostatic cycle. A district that survived three flood seasons weights rainfall signals differently than one that hasn't. The weights wᵢ are themselves the accumulated allostatic load of the system's experience. This is why chronic stress changes the bias term — not just the current error, but the prior that governs all future predictions.</div>
+
+    <div class="phase-row" onclick="togglePhase(2)">
+      <div class="phase-num" style="color:var(--green-bright)">III · Agentic</div>
+      <div class="phase-body"><div class="phase-name">Activation threshold</div><div class="phase-sub">f(σ², λ, ε) — when does the system fire?</div></div>
+      <div class="chevron" id="chev-2">▾</div>
+    </div>
+    <div class="phase-detail" id="det-2">The activation function in allostasis is calibrated to anticipated demand, not observed error. σ² (variance) tells the system how uncertain the prediction is. λ (regularization) prevents over-response to noise — the system that fires at every predicted perturbation exhausts itself. ε (residual error) corrects for systematic prediction bias. Allostatic failure occurs when σ² is chronically high and λ is insufficient — the system fires continuously at phantom threats. This is the biology of anxiety disorders, and the policy science of regulatory capture.</div>
+
+    <div class="phase-row" onclick="togglePhase(3)">
+      <div class="phase-num" style="color:var(--green-deep)">IV · Generative</div>
+      <div class="phase-body"><div class="phase-name">Predictive emission</div><div class="phase-sub">ŷ · ε_FGT — the system's bet on what comes next</div></div>
+      <div class="chevron" id="chev-3">▾</div>
+    </div>
+    <div class="phase-detail" id="det-3">The organism emits a prediction — cortisol, heart rate, cytokines — before the demand arrives. This is the allostatic output: not a reaction to ε_FGT but a bet on what ε_FGT will be. The NPA equivalent: publishing a district health forecast before the UBOS survey returns. The quality of the allostatic system is measured not by whether it reacts correctly, but by how accurate its anticipatory emissions are. ε_FGT here is the gap between the predicted demand and the demand that actually arrived.</div>
+
+    <div class="phase-row" onclick="togglePhase(4)">
+      <div class="phase-num" style="color:var(--green-mid)">V · Embodied</div>
+      <div class="phase-body"><div class="phase-name">Allostatic update</div><div class="phase-sub">Δw — the cost of prediction error writes to the prior</div></div>
+      <div class="chevron" id="chev-4">▾</div>
+    </div>
+    <div class="phase-detail" id="det-4">When the actual demand arrives, the system compares its prediction to reality. The weight update Δw doesn't just correct the current error — it recalibrates the anticipatory model. This is where allostatic load accumulates: every cycle of under- or over-prediction that isn't fully corrected raises the cost of the next prediction. In biological terms: the hypothalamic-pituitary-adrenal axis changes its baseline. In institutional terms: the NPA that repeatedly over-predicts crisis begins budgeting for crisis as a structural baseline. The update is embodied — it changes the physical parameters of the system, not just its current output.</div>
+  </div>
+
+  <h2>Allostatic load simulator</h2>
+  <p class="prose" style="margin-bottom:1.25rem">Adjust the parameters to see how allostatic load accumulates and where adaptive capacity breaks down.</p>
+
+  <div class="slider-section">
+    <div class="slider-row">
+      <div class="slider-meta"><span class="slider-name">Prediction variance σ²</span><span class="slider-val" id="v-sigma">0.45</span></div>
+      <input type="range" id="s-sigma" min="0" max="100" value="45" step="1" oninput="updateSim()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-meta"><span class="slider-name">Regularization λ</span><span class="slider-val" id="v-lambda">0.30</span></div>
+      <input type="range" id="s-lambda" min="0" max="100" value="30" step="1" oninput="updateSim()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-meta"><span class="slider-name">Cumulative ε — unresolved prediction error</span><span class="slider-val" id="v-eps">0.25</span></div>
+      <input type="range" id="s-eps" min="0" max="100" value="25" step="1" oninput="updateSim()">
+    </div>
+    <div class="slider-row">
+      <div class="slider-meta"><span class="slider-name">Adaptive capacity remaining</span><span class="slider-val" id="v-cap">0.70</span></div>
+      <input type="range" id="s-cap" min="10" max="100" value="70" step="1" oninput="updateSim()">
+    </div>
+  </div>
+
+  <div class="output-grid">
+    <div class="output-card">
+      <div class="output-label">Allostatic load</div>
+      <div class="output-val" id="o-load">—</div>
+      <div class="output-sub" id="o-load-sub">computing</div>
+    </div>
+    <div class="output-card">
+      <div class="output-label">System state</div>
+      <div class="output-val" id="o-state">—</div>
+      <div class="output-sub" id="o-state-sub">computing</div>
+    </div>
+    <div class="output-card">
+      <div class="output-label">f(σ², λ, ε) throughput</div>
+      <div class="output-val" id="o-through">—</div>
+      <div class="output-sub" id="o-through-sub">computing</div>
+    </div>
+    <div class="output-card">
+      <div class="output-label">Margin to failure</div>
+      <div class="output-val" id="o-margin">—</div>
+      <div class="output-sub" id="o-margin-sub">computing</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:2rem">
+    <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem">
+      <span class="mono-label">Load vs capacity</span>
+      <span class="mono-label" id="bar-label">—</span>
+    </div>
+    <div style="height:12px; background:var(--border); border-radius:6px; overflow:hidden; position:relative">
+      <div class="viz-bar" id="bar-load" style="height:12px; position:absolute; top:0; left:0; background:var(--green-bright);"></div>
+      <div id="bar-cap-marker" style="position:absolute; top:0; bottom:0; width:2px; background:var(--gold);"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:0.3rem">
+      <span style="font-family:var(--font-mono); font-size:0.6rem; color:var(--mist)">load →</span>
+      <span style="font-family:var(--font-mono); font-size:0.6rem; color:var(--gold)">│ capacity threshold</span>
+    </div>
+  </div>
+
+  <h2>Allostasis mapped to the pentad</h2>
+  <table class="iwgeu-table card">
+    <thead>
+      <tr>
+        <th>#</th><th>Layer</th><th>Symbol</th><th>Allostatic function</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-layer" style="color:var(--green-mid); border-left:3px solid var(--green-mid)">I · World</td>
+        <td>Signal + context</td>
+        <td class="td-sym">θᵗ</td>
+        <td class="td-allostatic">Raw state plus predictive context — environmental signals read for upcoming demand, not only current error.</td>
+      </tr>
+      <tr>
+        <td class="td-layer" style="color:var(--gold); border-left:3px solid var(--gold)">II · Perception</td>
+        <td>Prior + history</td>
+        <td class="td-sym">b + Σwᵢ·Xᵢ</td>
+        <td class="td-allostatic">The bias term encodes accumulated allostatic load. Past prediction errors are written into the institutional prior — not just corrected and forgotten.</td>
+      </tr>
+      <tr>
+        <td class="td-layer" style="color:var(--green-bright); border-left:3px solid var(--green-bright)">III · Agentic</td>
+        <td>Threshold calibration</td>
+        <td class="td-sym">f(σ², λ, ε)</td>
+        <td class="td-allostatic">Activation calibrated to anticipated demand. σ² = prediction uncertainty. λ = cost of over-response. ε = systematic bias correction.</td>
+      </tr>
+      <tr>
+        <td class="td-layer" style="color:var(--green-deep); border-left:3px solid var(--green-deep)">IV · Generative</td>
+        <td>Anticipatory emission</td>
+        <td class="td-sym">ŷ · ε_FGT</td>
+        <td class="td-allostatic">The organism emits its prediction before demand arrives. ε_FGT is the gap between predicted and actual demand — the allostatic error signal.</td>
+      </tr>
+      <tr>
+        <td class="td-layer" style="color:var(--green-mid); border-left:3px solid var(--green-mid)">V · Embodied</td>
+        <td>Load accumulation</td>
+        <td class="td-sym">L(θᵗ⁺¹)</td>
+        <td class="td-allostatic">Prediction error doesn't just update the current output — it recalibrates the anticipatory model. Chronic load shifts the baseline. The update is structural.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Comprehension check · 4 questions</h2>
+
+  <div id="quiz"></div>
+  <div class="score-box" id="score-box"><p class="score-title" id="score-title"></p><p class="score-sub" id="score-sub"></p></div>
+  <button class="complete-btn" id="complete-btn" onclick="markComplete()">Mark A501 complete</button>
+  <div class="completion-banner" id="completion-banner">
+    <div class="check">✓</div>
+    <h3>A501 complete</h3>
+    <p>Logged to your record · allostasis · prediction as adaptation · f(σ², λ, ε) throughput</p>
+  </div>
+</div>
+
+<script>
+const PHASES = [0,1,2,3,4];
+function togglePhase(i) {
+  const det = document.getElementById('det-' + i);
+  const chev = document.getElementById('chev-' + i);
+  const open = det.classList.contains('open');
+  PHASES.forEach(j => {
+    document.getElementById('det-' + j).classList.remove('open');
+    document.getElementById('chev-' + j).classList.remove('open');
+  });
+  if (!open) { det.classList.add('open'); chev.classList.add('open'); }
+}
+
+function updateSim() {
+  const sigma = parseInt(document.getElementById('s-sigma').value) / 100;
+  const lambda = parseInt(document.getElementById('s-lambda').value) / 100;
+  const eps = parseInt(document.getElementById('s-eps').value) / 100;
+  const cap = parseInt(document.getElementById('s-cap').value) / 100;
+
+  document.getElementById('v-sigma').textContent = sigma.toFixed(2);
+  document.getElementById('v-lambda').textContent = lambda.toFixed(2);
+  document.getElementById('v-eps').textContent = eps.toFixed(2);
+  document.getElementById('v-cap').textContent = cap.toFixed(2);
+
+  const load = Math.min(1, sigma * 0.45 + eps * 0.55 - lambda * 0.3);
+  const through = Math.max(0, Math.min(1, (1 - sigma * 0.3) * (1 - eps * 0.4) * (lambda * 0.5 + 0.5)));
+  const margin = Math.max(0, cap - load);
+  const ratio = load / cap;
+
+  document.getElementById('o-load').textContent = load.toFixed(2);
+  document.getElementById('o-through').textContent = through.toFixed(2);
+  document.getElementById('o-margin').textContent = margin.toFixed(2);
+
+  let state, stateSub, loadColor;
+  if (ratio < 0.6) { state = 'Adaptive'; stateSub = 'prediction errors within capacity'; loadColor = 'var(--green-bright)'; }
+  else if (ratio < 0.85) { state = 'Strained'; stateSub = 'load approaching capacity limit'; loadColor = 'var(--gold)'; }
+  else { state = 'Overload'; stateSub = 'allostatic failure — structural shift'; loadColor = '#e84040'; }
+
+  document.getElementById('o-state').textContent = state;
+  document.getElementById('o-state-sub').textContent = stateSub;
+  document.getElementById('o-through-sub').textContent = through > 0.6 ? 'signal passing through cleanly' : through > 0.3 ? 'throughput degraded' : 'signal heavily attenuated';
+  document.getElementById('o-margin-sub').textContent = margin > 0.2 ? 'buffer intact' : margin > 0 ? 'buffer nearly exhausted' : 'no buffer remaining';
+
+  const barLoad = document.getElementById('bar-load');
+  barLoad.style.width = Math.min(100, load * 100) + '%';
+  barLoad.style.background = loadColor;
+  document.getElementById('bar-cap-marker').style.left = (cap * 100) + '%';
+  document.getElementById('bar-label').textContent = 'load ' + (load * 100).toFixed(0) + '% · capacity ' + (cap * 100).toFixed(0) + '%';
+}
+updateSim();
+
+const QUESTIONS = [
+  {
+    q: "What is the defining difference between homeostasis and allostasis — and why does it matter for designing adaptive systems?",
+    options: [
+      "Homeostasis corrects deviations after they occur; allostasis anticipates demands and adjusts parameters in advance. The system that only reacts is always behind the perturbation.",
+      "Homeostasis is biological; allostasis is computational. They operate in different domains and cannot be directly compared.",
+      "Allostasis is homeostasis with a longer time horizon — both react to error, but allostasis reacts to errors that accumulate over weeks rather than seconds.",
+      "Homeostasis requires a fixed set point; allostasis requires no set point at all. Both ultimately maintain the same equilibrium by different means."
+    ],
+    correct: 0,
+    explain: "The key distinction is temporal and causal: homeostasis is reactive (error observed → correction), allostasis is predictive (demand anticipated → pre-adjustment). This is not a minor engineering detail. A system that only reacts is always one step behind. Heart rate rises before the first stride. Cortisol peaks before the stressor. The organism that waits for ε_FGT to arrive before adjusting is always paying the cost of surprise. Allostatic design means building the prediction loop into the architecture — not bolting reaction onto a finished system."
+  },
+  {
+    q: "In the pentadic mapping, allostatic load accumulates specifically at Layer V. What is the mechanism — and why can't it be undone by Layer III alone?",
+    options: [
+      "Layer V updates the output weights wᵢ; Layer III can reset these weights by rerunning the activation function with corrected inputs.",
+      "Layer V writes prediction error into the structural prior b — the bias term. Layer III operates downstream of b and cannot correct what b has already encoded. The load is embodied in the institution's prior, not just its current calculation.",
+      "Layer V accumulates fatigue in the physical hardware of the system; Layer III can partially compensate by reducing the activation threshold λ.",
+      "Allostatic load accumulates at Layer IV, not Layer V, because it is the emission layer that exhausts the system through repeated anticipatory output."
+    ],
+    correct: 1,
+    explain: "This is the structural argument. Layer V (Embodied) doesn't just output a correction — it updates the prior b. The bias term encodes every prediction cycle that wasn't fully resolved. A district health office that has been chronically under-resourced doesn't just have a current deficit; its institutional prior has shifted — it now systematically underestimates capacity and overestimates risk. Layer III (Agentic) calculates downstream of b. No amount of better activation-function calibration corrects a structurally shifted prior. The allostatic load is in the weights, not the current output. This is why chronic stress isn't solved by better stress management — the HPA axis has been recalibrated at the structural level."
+  },
+  {
+    q: "A DHO consistently predicts high CKD burden but UBOS surveys return lower numbers. Over time, the ε_FGT for this district trends negative. In allostatic terms, what has happened — and what is the correct intervention?",
+    options: [
+      "The DHO is providing bad-faith inputs. The correct intervention is audit and sanction.",
+      "The DHO's predictive model has accumulated systematic positive bias — the prior b has been shifted upward by the district's historical experience. The correct intervention is Bayesian recalibration of b, not sanction. The load is in the prior, not in the intent.",
+      "The UBOS survey methodology is flawed. The DHO's numbers are likely more accurate because they come from direct observation.",
+      "Negative ε_FGT indicates under-prediction, not over-prediction. The DHO's forecasts are too low."
+    ],
+    correct: 1,
+    explain: "Allostatic logic requires distinguishing bias from intent. A DHO in a district with historically high burden accumulates a positively shifted prior — b is encoding the allostatic load of the region's experience. Over-prediction is not evidence of bad faith; it is evidence of an uncalibrated prior. The correct intervention is Bayesian recalibration: weight the UBOS observation against the DHO's prior, compute the updated posterior, and let ε_FGT compress over successive cycles. Sanction treats a prediction problem as a moral problem — a category error that will destroy the federation's willingness to submit honest priors."
+  },
+  {
+    q: "In the allostatic load simulator: what combination of parameters produces a system that is simultaneously high-throughput and low-margin — and what does this state predict?",
+    options: [
+      "High σ², high λ, low ε. The system filters noise effectively but has consumed its buffer doing so. It predicts stable performance until the next major perturbation, which will likely cause overload.",
+      "Low σ², low λ, high ε. High throughput because activation is easy; low margin because unresolved error is accumulating. This predicts gradual structural drift — the system appears to function but its prior is shifting systematically.",
+      "High σ², low λ, low ε. The system is firing frequently at uncertain signals without a buffer. This predicts exhaustion via chronic over-response — the biological analogue of anxiety disorder, the institutional analogue of regulatory hyperactivity.",
+      "Low σ², high λ, high ε. High throughput because variance is contained; low margin because regularization is suppressing the error signal that should be updating the prior. The system appears adaptive but is accumulating unresolved load invisibly."
+    ],
+    correct: 3,
+    explain: "The most dangerous allostatic state is not the obviously strained one — it is the quietly drifting one. Low σ² (prediction seems reliable) plus high λ (system is disciplined, not over-responding) plus high ε (but the underlying error is large and not being incorporated) produces a system that looks healthy from the outside. Throughput is high. But the unresolved ε is not reaching the weight update — λ is suppressing it. The prior is not being corrected. This is the institutional equivalent of a ministry that appears to be functioning smoothly while its underlying data model diverges progressively from reality. The failure arrives suddenly, with no warning signal from the performance metrics that had looked fine until the day they didn't."
+  }
+];
+
+let answers = {}, revealed = {}, quizPassed = false;
+
+function buildQuiz() {
+  const container = document.getElementById('quiz');
+  QUESTIONS.forEach((q, qi) => {
+    const block = document.createElement('div');
+    block.className = 'q-block';
+    block.id = 'q-' + qi;
+    let optsHtml = q.options.map((opt, oi) =>
+      `<div class="opt" id="opt-${qi}-${oi}" onclick="pick(${qi},${oi})">
+        <span class="opt-ltr" id="ltr-${qi}-${oi}">${String.fromCharCode(65+oi)}</span>${opt}
+      </div>`
+    ).join('');
+    block.innerHTML = `<div class="q-head">
+      <div class="q-num">Q${qi+1}</div>
+      <p class="q-text">${q.q}</p>
+      <div id="opts-${qi}">${optsHtml}</div>
+    </div>
+    <div class="explain" id="exp-${qi}" style="display:none"></div>`;
+    container.appendChild(block);
+  });
+}
+
+function pick(qi, oi) {
+  if (revealed[qi] !== undefined) return;
+  revealed[qi] = true;
+  answers[qi] = oi;
+  const q = QUESTIONS[qi];
+  for (let i = 0; i < q.options.length; i++) {
+    const el = document.getElementById('opt-' + qi + '-' + i);
+    const ltr = document.getElementById('ltr-' + qi + '-' + i);
+    el.style.cursor = 'default';
+    if (i === q.correct) { el.classList.add('correct'); ltr.textContent = '✓'; }
+    else if (i === oi && oi !== q.correct) { el.classList.add('wrong'); ltr.textContent = '✗'; }
+  }
+  const exp = document.getElementById('exp-' + qi);
+  exp.textContent = q.explain;
+  exp.className = 'explain ' + (oi === q.correct ? 'correct' : 'wrong');
+  exp.style.display = 'block';
+
+  if (Object.keys(revealed).length === QUESTIONS.length) showScore();
+}
+
+function showScore() {
+  const score = QUESTIONS.filter((q, i) => answers[i] === q.correct).length;
+  const box = document.getElementById('score-box');
+  box.classList.add('show');
+  quizPassed = score === QUESTIONS.length;
+  if (quizPassed) {
+    box.classList.add('pass');
+    document.getElementById('score-title').textContent = 'All correct — the organism predicted before it reacted.';
+    document.getElementById('score-sub').textContent = 'Mark complete to log A501 to your record.';
+    document.getElementById('complete-btn').classList.add('show');
+  } else {
+    box.classList.add('fail');
+    document.getElementById('score-title').textContent = score + ' / ' + QUESTIONS.length + ' — the prior needs updating.';
+    document.getElementById('score-sub').textContent = 'Re-read the phase anatomy and the load simulator, then retake.';
+  }
+}
+
+function markComplete() {
+  document.getElementById('complete-btn').classList.remove('show');
+  document.getElementById('completion-banner').classList.add('show');
+  document.getElementById('completion-banner').scrollIntoView({ behavior: 'smooth' });
+}
+
+buildQuiz();
+</script>
